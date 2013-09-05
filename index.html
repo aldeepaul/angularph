@@ -1,0 +1,90 @@
+<html>
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <script src="jquery-1.9.1.js"></script>
+    <script src="http://204.9.243.109/socket.io/socket.io.js"></script>
+    <style>
+        body { background-color: #e5e5e5;font-family:Roboto,arial,sans-serif}
+        .feed {
+            background-color: #fff;
+            border: 1px solid #d8d8d8;
+            border-radius: 3px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+        }
+
+        .feed:hover {
+            box-shadow: 0 0 30px rgba(0,0,0,.5);
+        }
+
+        .feed .user {
+            color: #262626;
+            font-weight: bold;
+        }
+        .feed .time {
+            color: #999;
+            display: inline-block;
+            font-size: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d8d8d8;
+            width: 75%;
+            margin-bottom: 10px;
+        }
+        .feed .msg {
+            color: rgb(64, 64, 64);
+            display: block;
+            font-family: Roboto, arial, sans-serif;
+            font-size: 13px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: normal;
+            line-height: 18px;
+            visibility: visible;
+            white-space: normal;
+        }
+    </style>
+</head>
+<body>
+<div id='twitterfeed' style="width: 400px;margin: 0 auto;">
+
+</div>
+<script>
+    var socket = {}; //make socket global
+    $(function(){
+        //websocket connect
+        //var host = window.location.host.split(':')[0];
+        //socket = io.connect('http://' + host + ':3000');
+        socket = io.connect('http://204.9.243.109');
+        var cons = $('#console');
+
+        socket.on('connect', function() {
+        });
+        socket.on('tweet', function(message){
+            try {
+                var data = JSON.parse(message);
+                var parsetweet = function(data){
+                    if($.isEmptyObject(data)){ return null;}
+                    var return_html = '<div style="display: none;">';
+                    return_html += '<div class="feed" style="display: block;">' +
+                            '<div style="float: right"><img  src="'+ data.user.profile_image_url+'"/></div>' +
+                            '<div class="user">' + data.user.screen_name + '</div>' +
+                            '<div class="time">' + data.created_at + '</div>' +
+                            '<div class="msg">'+ data.text + '</div>' +
+                            '</div>';
+                    return return_html;
+                }
+                twtdiv = $('#twitterfeed');
+                $(parsetweet(data)).prependTo(twtdiv).slideDown('slow');
+            }catch (SyntaxError) {
+                console.log('twitter syntax error')
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
